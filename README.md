@@ -83,6 +83,38 @@ cd backend/ai_engine
 powershell -ExecutionPolicy Bypass -File .\scripts\run.ps1
 ```
 
+
+## 🧰 Optimization Tools & SOP
+
+We implemented specific Standard Operating Procedures (SOP) to ensure high performance on consumer hardware (e.g., RTX 3050).
+
+### 1. Required Tools (Download Links)
+*   **[FFmpeg](https://ffmpeg.org/download.html)**: Essential for video processing. Must be added to System PATH.
+*   **[NVIDIA CUDA Toolkit 11.8+](https://developer.nvidia.com/cuda-downloads)**: Required for GPU acceleration.
+*   **[Node.js v18+](https://nodejs.org/en/download/)**: Runtime for the Backend/Frontend.
+*   **[Git](https://git-scm.com/downloads)**: For version control.
+
+### 2. Applied Code Optimizations (SOP)
+
+#### A. **Fixing "Black Screen" (Video Transcoding)**
+*   **Issue**: `h264_nvenc` (GPU encoding) was stalling/conflicting with the AI Engine on the same GPU.
+*   **Code Change**: backend/api_gateway/src/controllers/streamController.js
+*   **Resolution**: Switched to **CPU-based encoding** (`libx264`) with `ultrafast` preset.
+    ```javascript
+    '-c:v', 'libx264',
+    '-preset', 'ultrafast',
+    '-tune', 'zerolatency',
+    ```
+
+#### B. **Fixing "Low FPS" (AI Latency)**
+*   **Issue**: Decoding full 1080p/4K streams created massive memory bandwidth pressure, causing high latency (500ms+).
+*   **Code Change**: backend/ai_engine/src/RtspDecoder.cpp
+*   **Resolution**: Implemented **Direct Resize** during the decoding step to target model resolution (640x640).
+    ```cpp
+    // Resize to 640x640 directly during decode/convert
+    sws_getContext(..., 640, 640, ...);
+    ```
+
 ## 🔧 Troubleshooting
 
 ### Video is Black Screen?

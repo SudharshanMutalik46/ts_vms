@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package vms.recording;
+
+import "google/protobuf/empty.proto";
+
+option cc_enable_arenas = true;
+
+// ============================================================================
+// VMS Recording Engine gRPC Service
+// Controls video recording from RTSP cameras via FFmpeg subprocess
+// ============================================================================
+
+service RecordingEngine {
+  // Start recording for a camera
+  rpc StartRecording(StartRecordingRequest) returns (StartRecordingResponse);
+  
+  // Stop recording for a camera
+  rpc StopRecording(StopRecordingRequest) returns (StopRecordingResponse);
+  
+  // Get status of a specific camera's recording
+  rpc GetStatus(StatusRequest) returns (StatusResponse);
+  
+  // List all active recordings
+  rpc ListActive(google.protobuf.Empty) returns (ListActiveResponse);
+  
+  // Get disk usage statistics
+  rpc GetDiskStatus(google.protobuf.Empty) returns (DiskStatusResponse);
+  
+  // Stream real-time events (segment written, errors, state changes)
+  rpc StreamEvents(google.protobuf.Empty) returns (stream Event);
+
+  // Capture a single snapshot from a camera stream
+  rpc CaptureSnapshot(CaptureSnapshotRequest) returns (CaptureSnapshotResponse);
+}
+
+// ============================================================================
+// Request/Response Messages
+// ============================================================================
+
+message StartRecordingRequest {
+  string camera_id = 1;
+  string rtsp_url = 2;              // Full RTSP URL (credentials included by Node)
+  int32 segment_seconds = 3;        // Segment duration (default: 60)
+  string recordings_base_dir = 4;   // Base directory for recordings
+  string profile = 5;               // Optional: "main", "low", "high"
+}
+
+message StartRecordingResponse {
+  bool started = 1;
+  string session_id = 2;
+  string message = 3;
+}
+
+message StopRecordingRequest {
+  string camera_id = 1;
+}
+
+message StopRecordingResponse {
+  bool stopped = 1;
+  string message = 2;
+  // Phase 4 Finalization: Added fields for merged final file
+  string final_file_path = 3;   // Relative path to final.mp4 from recordings_base_dir
+  int64 final_size_bytes = 4;   // Size of final.mp4
+  bool merged = 5;              // True if segments were successfully merged
+}
+
+message StatusRequest {
+  string camera_id = 1;
+}
+
+message StatusResponse {
+  RecordingState state = 1;
+  string session_id = 2;
+  string last_error = 3;
+  int64 bytes_written = 4;
+  int64 segments_written = 5;
+  int64 uptime_seconds = 6;
+}
+
+message ListActiveResponse {
+  repeated ActiveRecording recordings = 1;
+}
+
+message ActiveRecording {
+  string camera_id = 1;
+  string session_id = 2;
+  RecordingState state = 3;
+  int64 uptime_seconds = 4;
+  int64 segments_written = 5;
+}
+
+message DiskStatusResponse {
+  int64 free_bytes = 1;
+  int64 total_bytes = 2;
+  int64 used_bytes = 3;
+  string recordings_dir = 4;
+}
+
+message CaptureSnapshotRequest {
+  string camera_id = 1;
+  string event_id = 2;              // Used for filename generation
+  string rtsp_url = 3;              // Credentials included
+  string snapshots_base_dir = 4;    // Optional override
+  int32 timeout_seconds = 5;        // Default: 10
+}
+
+message CaptureSnapshotResponse {
+  bool ok = 1;
+  string snapshot_path = 2;         // Relative path
+  int64 size_bytes = 3;
+  string message = 4;
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum RecordingState {
+  STOPPED = 0;
+  STARTING = 1;
+  RUNNING = 2;
+  RECONNECTING = 3;
+  ERROR = 4;
+}
+
+// ============================================================================
+// Event Streaming
+// ============================================================================
+
+message Event {
+  oneof event_type {
+    SegmentWrittenEvent segment_written = 1;
+    StateChangedEvent state_changed = 2;
+    RecordingErrorEvent recording_error = 3;
+  }
+}
+
+message SegmentWrittenEvent {
+  string camera_id = 1;
+  string session_id = 2;
+  string file_path = 3;             // Relative path from recordings_base_dir
+  int64 start_timestamp_ms = 4;
+  int64 end_timestamp_ms = 5;
+  int64 size_bytes = 6;
+  int32 segment_index = 7;
+}
+
+message StateChangedEvent {
+  string camera_id = 1;
+  RecordingState old_state = 2;
+  RecordingState new_state = 3;
+  string message = 4;
+}
+
+message RecordingErrorEvent {
+  string camera_id = 1;
+  string session_id = 2;
+  int32 error_code = 3;
+  string message = 4;
+}

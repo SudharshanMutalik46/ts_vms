@@ -1,0 +1,7 @@
+{
+  "name": "Techno VMS",
+  "description": "Next-generation CCTV Video Management System featuring AI-powered analytics, WebRTC low-latency streaming, and role-based access control.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

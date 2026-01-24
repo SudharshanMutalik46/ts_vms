@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Techno VMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              techno: {
+                950: '#0c0a09', // Warm black
+                900: '#1c1917', // Stone-900
+                800: '#292524', // Stone-800
+                700: '#44403c', // Stone-700
+                600: '#ea580c', // Orange-600 (Primary Brand)
+                500: '#f97316', // Orange-500 (Hover/Bright)
+                400: '#fb923c', // Orange-400 (Light)
+                accent: '#f97316', 
+                danger: '#ef4444',
+                success: '#10b981'
+              },
+              slate: {
+                950: '#0c0a09',
+                900: '#1c1917',
+                800: '#292524',
+                700: '#44403c',
+              }
+            },
+            animation: {
+              'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'scan': 'scan 3s linear infinite',
+            },
+            keyframes: {
+              scan: {
+                '0%': { transform: 'translateY(-100%)' },
+                '100%': { transform: 'translateY(100%)' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

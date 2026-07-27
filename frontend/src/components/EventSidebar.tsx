@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { Bell, Clock, ChevronRight } from 'lucide-react'
 import type { AIEvent } from '../types'
 import * as api from '../services/api'

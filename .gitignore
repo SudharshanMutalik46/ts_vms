@@ -1,54 +1,40 @@
-# Logs
-logs
-*.log
+# Node
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Environment
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
+*.local
 
 # Build
 dist/
-build/
+dist-ssr/
+**/build/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # Logs
 logs/
 *.log
 
 # Video / Media / HLS
-*.ts
-*.m3u8
-hls/
-recordings/
-snapshots/
-clips/
+**/hls/
+**/recordings/
+**/snapshots/
+**/clips/
+**/runtime/
+**/hls/**/*.ts
+**/recordings/**/*.ts
+**/runtime/**/*.ts
+**/*.m3u8
+**/*.mp4
 
 # OS
 .DS_Store
@@ -57,47 +43,28 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Temp
 tmp/
 temp/
 
-# VMS runtime data
-hls/
-recordings/
-snapshots/
-clips/
-*.ts
-*.m3u8
-
 # Native builds
-**/build/
 **/*.exe
 **/*.dll
 **/*.pdb
 **/*.obj
 **/*.ilk
 **/*.tlog
-
-# Runtime data
-**/runtime/
-**/recordings/
-*.mp4
-*.ts
-*.m3u8
-
-# Env files
-.env
-.env.*
+**/*.lib
 
 # AI Models
 *.onnx
 *.pt
 
-# Binaries
+# Archives
 *.zip
-*.dll
-*.exe
-*.pdb
-*.obj
-*.lib

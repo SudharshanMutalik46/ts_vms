@@ -1,20 +1,19 @@
 import { Maximize2, Volume2, VolumeX, AlertCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import type { Camera } from '../types'
+import type { AIEvent, Camera } from '../types'
 // HLS deprecated for now, using FLV
 // import HlsPlayer from './HlsPlayer'
 import FlvPlayer from './FlvPlayer'
 import * as api from '../services/api'
 
 interface CameraTileProps {
-    camera: any
+    camera: Camera
     onFullscreen?: () => void
-    onEdit?: (camera: any) => void
-    onAIConfig?: (camera: any) => void
-    latestEvent?: any
+    onAIConfig?: (camera: Camera) => void
+    latestEvent?: AIEvent
 }
 
-export default function CameraTile({ camera, onFullscreen, onEdit, onAIConfig, latestEvent }: CameraTileProps) {
+export default function CameraTile({ camera, onFullscreen, onAIConfig, latestEvent }: CameraTileProps) {
     const [isStreaming, setIsStreaming] = useState(false)
     const [streamUrl, setStreamUrl] = useState<string | null>(null)
     const [muted, setMuted] = useState(true)

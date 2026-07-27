@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, Filter, RefreshCw, Clock, Camera, AlertTriangle } from 'lucide-react'
+import { Bell, RefreshCw, AlertTriangle } from 'lucide-react'
 import * as api from '../services/api'
 import { initSocket, onAIEvent, getSocket } from '../services/socket'
 import { useAuth } from '../contexts/AuthContext'
@@ -26,7 +26,7 @@ export default function EventDashboard() {
     useEffect(() => {
         if (!token) return
 
-        const socket = initSocket(token)
+        initSocket(token)
 
         const unsubscribe = onAIEvent((event) => {
             // Add new event to the top

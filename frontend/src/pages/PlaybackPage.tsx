@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Play, Calendar, Clock, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
+import { Play, Calendar, Clock, Trash2 } from 'lucide-react'
 import * as api from '../services/api'
 import type { Recording, Camera } from '../types'
 // import HlsPlayer from '../components/HlsPlayer'
@@ -13,7 +13,6 @@ export default function PlaybackPage() {
     const [selectedRecording, setSelectedRecording] = useState<Recording | null>(null)
     const [selectedCamera, setSelectedCamera] = useState<string>('')
 
-    const eventId = searchParams.get('event_id')
     const cameraId = searchParams.get('camera_id')
 
     useEffect(() => {

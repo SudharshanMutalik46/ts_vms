@@ -1,4 +1,4 @@
-import { Activity, Camera, Shield, AlertTriangle, Cpu } from 'lucide-react'
+import { Activity, Camera, AlertTriangle, Cpu } from 'lucide-react'
 import type { Camera as CameraType, AIEvent } from '../types'
 
 interface LiveStatsProps {

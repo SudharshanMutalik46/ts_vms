@@ -1,134 +1,122 @@
-# Techno VMS - AI-Powered Video Management System
+# Techno VMS
 
-Techno VMS is a high-performance Video Management System designed for real-time surveillance with advanced AI analytics. It features hardware-accelerated object detection, low-latency video streaming, and a modern dashboard interface.
+[![Frontend CI](https://github.com/SudharshanMutalik46/ts_vms/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/SudharshanMutalik46/ts_vms/actions/workflows/frontend-ci.yml)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=111827)
+![C++](https://img.shields.io/badge/C++-17-00599C?logo=cplusplus&logoColor=white)
 
-## 🚀 Key Features
+An in-progress video management system for multi-camera monitoring, recording, and AI-assisted event detection. The repository demonstrates a React operations dashboard, C++ service boundaries, gRPC contracts, PostgreSQL migrations, and practical performance and verification documentation.
 
-*   **Real-Time AI Detection**: Uses **YOLOv8** (ONNX) running on **CUDA (GPU)** for high-speed object detection (Person, Vehicle, etc.).
-*   **Visual Analytics**: Displays detections with a "Green Box" overlay, featuring solid label backgrounds and confidence scores.
-*   **Low Latency Streaming**: Optimized HTTP-FLV streaming pipeline.
-    *   *Note*: Uses **CPU (`libx264`)** for video transcoding to ensure stability (prevents black screens).
-    *   *Note*: Uses **GPU (CUDA)** for AI inference.
-*   **Automated Optimization**: The AI Engine automatically resizes high-resolution RTSP streams to **640x640** during decoding to maximize FPS and minimize latency (~50ms).
-*   **Smart Alerts**: Configurable zones and line-crossing detection (In/Out counting).
+> [!IMPORTANT]
+> This is a development portfolio project, not a production-ready security product. The public snapshot does not currently include the Node.js API gateway required for an end-to-end deployment.
 
-## 🛠️ Architecture
+## What is included
 
-*   **Frontend**: React, TailwindCSS, Vite (Dashboard & Video Player).
-*   **Backend (API Gateway)**: Node.js, Express (REST API, Stream Management).
-*   **AI Engine**: C++17, ONNX Runtime (GPU), FFmpeg (Video Decoding).
+- Multi-camera live-view and playback interfaces
+- Role-aware authentication state and protected navigation
+- AI event dashboard with real-time Socket.IO updates
+- Camera health, storage, and configuration screens
+- C++17 AI engine using FFmpeg, ONNX Runtime, gRPC, and optional CUDA
+- C++17 recording engine using FFmpeg subprocess supervision and gRPC
+- PostgreSQL schema and migrations for camera AI features
+- Performance baselines, soak-test planning, and a verification checklist
+- GitHub Actions validation for the TypeScript frontend
 
-## 📋 Prerequisites
+## Architecture
 
-*   **OS**: Windows 10/11 (Recommended).
-*   **Node.js**: v18+ installed.
-*   **GPU**: NVIDIA GPU with updated drivers (for AI acceleration).
-*   **CUDA Toolkit**: v11.x or v12.x installed.
-*   **C++ Build Tools**: Visual Studio 2019/2022 with C++ Desktop Development credentials.
-*   **FFmpeg**: Installed and added to system PATH.
+```mermaid
+flowchart LR
+    UI["React dashboard"]
+    API["API gateway<br/>(not in public snapshot)"]
+    AI["AI engine<br/>C++ / ONNX / FFmpeg"]
+    REC["Recording engine<br/>C++ / FFmpeg"]
+    DB[("PostgreSQL")]
 
-## ⚙️ Installation
-
-### 1. Backend (API Gateway)
-```bash
-cd backend/api_gateway
-npm install
-```
-*Configure `.env` if necessary (database credentials, secrets).*
-
-### 2. Frontend (Dashboard)
-```bash
-cd frontend
-npm install
+    UI -->|REST / WebSocket| API
+    API -->|gRPC| AI
+    API -->|gRPC| REC
+    API --> DB
 ```
 
-### 3. AI Engine (C++)
-The AI Engine requires building from source using CMake.
+## Repository map
+
+| Path | Purpose | Status |
+|---|---|---|
+| `frontend/` | Primary React and TypeScript operations dashboard | Builds successfully |
+| `backend/ai_engine/` | RTSP decoding and ONNX inference service | Source available; external native dependencies required |
+| `backend/recording_engine/` | Recording and disk-layout service | Source available; external native dependencies required |
+| `backend/database/` | PostgreSQL schema and migrations | Available |
+| `backend/docs/` | Contracts, performance notes, soak plan, and verification checklist | Available |
+| Root React files | Earlier standalone dashboard prototype | Kept for reference |
+| `backend/api_gateway/` | REST, stream, and gRPC orchestration layer | Not included in the public snapshot |
+
+## Frontend quick start
+
+Prerequisites:
+
+- Node.js 20 or later
+- npm 10 or later
+
 ```bash
-cd backend/ai_engine
-mkdir build
-cd build
-cmake ..
-cmake --build . --config Release
-```
-*Ensure `yolov8s.onnx` is placed in `backend/ai_engine/models/`.*
-
-## ▶️ Running the System
-
-You can use the helper script or run components individually.
-
-### Quick Start (Windows)
-Run the automated startup script:
-```powershell
-./start_vms.bat
-```
-
-### Manual Start
-
-**Terminal 1: Backend**
-```bash
-cd backend/api_gateway
+git clone https://github.com/SudharshanMutalik46/ts_vms.git
+cd ts_vms/frontend
+npm ci
 npm run dev
 ```
 
-**Terminal 2: Frontend**
+Open `http://localhost:5173`.
+
+The development server proxies `/api`, `/streams`, and `/socket.io` to `http://localhost:3000`. A compatible API gateway is required for live data, authentication, and video streams.
+
+Create a production build with:
+
 ```bash
 cd frontend
-npm run dev
+npm ci
+npm run build
 ```
 
-**Terminal 3: AI Engine**
-```powershell
-cd backend/ai_engine
-powershell -ExecutionPolicy Bypass -File .\scripts\run.ps1
+## Native services
+
+Both native services require CMake 3.16+, a C++17 compiler, Protobuf, gRPC, and spdlog.
+
+The AI engine additionally requires FFmpeg development libraries and ONNX Runtime. CUDA inference is enabled when the ONNX Runtime CUDA provider is available.
+
+```bash
+cmake -S backend/ai_engine -B backend/ai_engine/build -DCMAKE_BUILD_TYPE=Release
+cmake --build backend/ai_engine/build --config Release
+
+cmake -S backend/recording_engine -B backend/recording_engine/build -DCMAKE_BUILD_TYPE=Release
+cmake --build backend/recording_engine/build --config Release
 ```
 
+See the [recording engine guide](backend/recording_engine/README.md) and [AI engine contract](backend/docs/ai_engine_contract.md) for component-specific details.
 
-## 🧰 Optimization Tools & SOP
+## Engineering notes
 
-We implemented specific Standard Operating Procedures (SOP) to ensure high performance on consumer hardware (e.g., RTX 3050).
+- AI frames are resized to the model input size during decoding to reduce avoidable memory and latency overhead.
+- The recording engine separates session management, process supervision, disk layout, and gRPC transport.
+- Runtime media, models, native binaries, build outputs, archives, and environment files are excluded from version control.
+- Verification material is maintained under [`backend/docs`](backend/docs), including the [master checklist](backend/docs/verification/master_checklist.md) and [soak-test plan](backend/docs/soak/phase5_6_soak_plan.md).
 
-### 1. Required Tools (Download Links)
-*   **[FFmpeg](https://ffmpeg.org/download.html)**: Essential for video processing. Must be added to System PATH.
-*   **[NVIDIA CUDA Toolkit 11.8+](https://developer.nvidia.com/cuda-downloads)**: Required for GPU acceleration.
-*   **[Node.js v18+](https://nodejs.org/en/download/)**: Runtime for the Backend/Frontend.
-*   **[Git](https://git-scm.com/downloads)**: For version control.
+## Current roadmap
 
-### 2. Applied Code Optimizations (SOP)
+- [x] Recover and validate the primary TypeScript frontend
+- [x] Add automated frontend build checks
+- [x] Document public component status and dependencies
+- [ ] Publish or replace the API gateway
+- [ ] Add containerized local development
+- [ ] Add native-engine unit and integration tests
+- [ ] Add a sanitized demo and architecture screenshots
 
-#### A. **Fixing "Black Screen" (Video Transcoding)**
-*   **Issue**: `h264_nvenc` (GPU encoding) was stalling/conflicting with the AI Engine on the same GPU.
-*   **Code Change**: backend/api_gateway/src/controllers/streamController.js
-*   **Resolution**: Switched to **CPU-based encoding** (`libx264`) with `ultrafast` preset.
-    ```javascript
-    '-c:v', 'libx264',
-    '-preset', 'ultrafast',
-    '-tune', 'zerolatency',
-    ```
+## Security
 
-#### B. **Fixing "Low FPS" (AI Latency)**
-*   **Issue**: Decoding full 1080p/4K streams created massive memory bandwidth pressure, causing high latency (500ms+).
-*   **Code Change**: backend/ai_engine/src/RtspDecoder.cpp
-*   **Resolution**: Implemented **Direct Resize** during the decoding step to target model resolution (640x640).
-    ```cpp
-    // Resize to 640x640 directly during decode/convert
-    sws_getContext(..., 640, 640, ...);
-    ```
+Never commit camera credentials, RTSP URLs, JWTs, private keys, recordings, or model binaries. Use test streams and non-production credentials during development. See [SECURITY.md](SECURITY.md) for reporting guidance.
 
-## 🔧 Troubleshooting
+## Author
 
-### Video is Black Screen?
-*   The system falls back to **CPU encoding (`libx264`)** for the visual stream to prevent driver conflicts with the AI Engine.
-*   Check if FFmpeg is installed and accessible.
-*   Refresh the page to restart the FLV stream.
+**Sudharshan Mutalik**
 
-### Low FPS / High Latency?
-*   The AI Engine is pre-configured to downscale video to **640x640**.
-*   If latency persists, check if the **CUDA Execution Provider** is enabled in the AI Engine logs.
-*   Ensure your camera is set to **H.264** (preferred) or H.265.
+AWS Cloud Support Engineer · Linux Administrator · DevOps Engineer
 
-## 🤝 Contributing
-1.  Fork the repository.
-2.  Create a feature branch.
-3.  Commit your changes.
-4.  Push to the branch and start a Pull Request.
+[LinkedIn](https://www.linkedin.com/in/sudharshan-mutalik) · [GitHub](https://github.com/SudharshanMutalik46)

@@ -54,7 +54,7 @@ flowchart LR
 
 Prerequisites:
 
-- Node.js 20 or later
+- Node.js 22 or later
 - npm 10 or later
 
 ```bash
